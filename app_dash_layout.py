@@ -32,7 +32,6 @@ app.layout = html.Div(
 
 
 
-
 @app.callback(
     dash.dependencies.Output("graph", "figure"),
     [dash.dependencies.Input("x-variable", "value"),
