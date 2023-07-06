@@ -1,9 +1,11 @@
 import pandas as pd
 import plotly.express as px
 import dash
-from dash import html, dcc
+import dash_bootstrap_components as dbc
+import dash_html_components as html
+import dash_core_components as dcc
 
-# Read the data from the CSV file, skipping problematic lines
+
 try:
     data = pd.read_csv(
         'https://raw.githubusercontent.com/chriszapp/datasets/main/books.csv', error_bad_lines=False)
@@ -11,29 +13,50 @@ except pd.errors.ParserError as e:
     print(f"Error reading CSV: {str(e)}")
     exit(1)
 
-# Create the Dash app
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server 
 
-# Define the layout of the app
-app.layout = html.Div(
+
+
+
+app.layout = dbc.Container(
+    fluid=True,
     children=[
-        html.H1("Book Data Visualization"),
-        dcc.Dropdown(
-            id="x-variable",
-            options=[{'label': col, 'value': col} for col in data.columns],
-            value=data.columns[0]  # Set the default value
+        html.H1("Book Data Visualization", className="mt-4 mb-4"),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Dropdown(
+                        id="x-variable",
+                        options=[{'label': col, 'value': col}
+                                 for col in data.columns],
+                        value=data.columns[0],  # Set the default value
+                        className="mb-4"
+                    ),
+                    width=6
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        id="y-variable",
+                        options=[{'label': col, 'value': col}
+                                 for col in data.columns],
+                        value=data.columns[1],  # Set the default value
+                        className="mb-4"
+                    ),
+                    width=6
+                )
+            ],
+            className="mb-4"
         ),
-        dcc.Dropdown(
-            id="y-variable",
-            options=[{'label': col, 'value': col} for col in data.columns],
-            value=data.columns[1]  # Set the default value
-        ),
-        dcc.Graph(id="graph")
+        dbc.Row(
+            dbc.Col(
+                dcc.Graph(id="graph"),
+                width={"size": 10, "offset": 1}
+            )
+        )
     ]
 )
 
-# Define the callback function for updating the graph
 
 
 @app.callback(
@@ -46,6 +69,6 @@ def update_graph(x_variable, y_variable):
     return fig
 
 
-# Run the app
 if __name__ == "__main__":
     app.run_server(debug=True)
+
